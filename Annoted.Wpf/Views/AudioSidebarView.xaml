@@ -192,6 +192,7 @@
                     Visibility="{Binding ShowWaveform, Converter={StaticResource BoolToVisibility}}">
                 <Grid x:Name="WaveformHost"
                       MouseLeftButtonDown="Waveform_MouseDown"
+                      MouseLeftButtonUp="Waveform_MouseUp"
                       MouseMove="Waveform_MouseMove"
                       Background="Transparent">
                     <!-- Static waveform bitmap (only when no live capture is running) -->

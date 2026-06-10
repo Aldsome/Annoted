@@ -13,7 +13,7 @@
     <Authors>Aldsome</Authors>
     <Description>A Windows notes app with tabs, autosave, themes, export, and audio notes.</Description>
     <Copyright>Copyright (c) Aldsome 2026</Copyright>
-    <Version>2.0.0</Version>
+    <Version>0.1.1</Version>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <SelfContained>true</SelfContained>
     <PublishSingleFile>true</PublishSingleFile>

@@ -41,8 +41,9 @@ jobs:
       - name: Package zip
         shell: pwsh
         run: |
+          $name = "Annoted-${{ github.ref_name }}-win-x64"
           $publishDir = "Annoted.Wpf/bin/Release/net8.0-windows/win-x64/publish"
-          $stageDir = "artifacts/Annoted-v0.1.0-beta-win-x64"
+          $stageDir = "artifacts/$name"
           New-Item -ItemType Directory -Force -Path $stageDir | Out-Null
           Copy-Item "$publishDir/*" $stageDir -Recurse -Force
           # Whisper native engine lives under runtimes/win-x64/native — verify it survived publish.
@@ -53,7 +54,7 @@ jobs:
             }
           }
           @"
-          Annoted v0.1.0-beta (win-x64)
+          Annoted ${{ github.ref_name }} (win-x64)
 
           Requires .NET Desktop Runtime 8.0 or newer.
           Download: https://dotnet.microsoft.com/download/dotnet/8.0
@@ -61,13 +62,13 @@ jobs:
           Run Annoted.exe from this folder. Keep the runtimes/ folder beside it
           (it contains the Whisper speech engine).
           "@ | Set-Content "$stageDir/README.txt"
-          Compress-Archive -Path "$stageDir/*" -DestinationPath "artifacts/Annoted-v0.1.0-beta-win-x64.zip" -Force
+          Compress-Archive -Path "$stageDir/*" -DestinationPath "artifacts/$name.zip" -Force
 
       - name: Upload Annoted zip
         uses: actions/upload-artifact@v4
         with:
-          name: Annoted-v0.1.0-beta-win-x64
-          path: artifacts/Annoted-v0.1.0-beta-win-x64.zip
+          name: Annoted-${{ github.ref_name }}-win-x64
+          path: artifacts/Annoted-${{ github.ref_name }}-win-x64.zip
           if-no-files-found: error
 
       - name: Create GitHub release
@@ -77,16 +78,17 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           $tag = "${{ github.ref_name }}"
+          $zip = "artifacts/Annoted-$tag-win-x64.zip"
           $notes = @"
-          Annoted $tag — first beta of the WinForms to WPF rework.
+          Annoted $tag — beta of the WinForms to WPF rework.
 
-          Requires .NET Desktop Runtime 8.0 or newer:
+          Requires .NET Desktop Runtime 8.0 or newer (preinstalled on most Win10/11;
+          if missing, the app will prompt to install it):
           https://dotnet.microsoft.com/download/dotnet/8.0
 
-          Download Annoted-v0.1.0-beta-win-x64.zip, extract, and run Annoted.exe.
+          Download the zip, extract, and run Annoted.exe.
           Keep the runtimes/ folder beside the exe (Whisper speech engine).
 
           See CHANGELOG.md for full notes.
           "@
-          gh release create $tag "artifacts/Annoted-v0.1.0-beta-win-x64.zip" `
-            --title "Annoted $tag" --notes "$notes" --prerelease
+          gh release create $tag $zip --title "Annoted $tag" --notes "$notes" --prerelease

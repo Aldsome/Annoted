@@ -149,45 +149,42 @@ public partial class AudioSidebarView : UserControl
             Vm.DeleteMemos(items);
     }
 
-    private System.Windows.Threading.DispatcherTimer? _clickTimer;
-    private double _pendingClickRatio;
+    private System.Windows.Point _downPoint;
+    private bool _doubleClickDown;   // true while a double-click's button is held — never scrub/pause
+    private bool _isScrubbing;       // true once movement passes the drag threshold
 
+    // Click count decides intent immediately — no OS double-click interval delay.
+    //  • single-click → seek (pause+seek if playing)
+    //  • double-click → seek + play from the exact position
     private void Waveform_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
         if (DataContext is not AudioSidebarViewModel vm || vm.IsVisualizerActive) return;
         var ratio = PointerRatio(e);
+        _downPoint = e.GetPosition(WaveformHost);
+        _isScrubbing = false;
+        _doubleClickDown = e.ClickCount >= 2;
 
-        if (e.ClickCount >= 2)
-        {
-            // Double-click: cancel the pending single-click so it can't pause/reset first, then play.
-            _clickTimer?.Stop();
-            _ = vm.PlayFromAsync(ratio);
-            return;
-        }
-
-        // Single-click: defer past the double-click window; a double-click cancels it.
-        _pendingClickRatio = ratio;
-        _clickTimer ??= new System.Windows.Threading.DispatcherTimer
-        {
-            Interval = TimeSpan.FromMilliseconds(System.Windows.Forms.SystemInformation.DoubleClickTime)
-        };
-        _clickTimer.Stop();
-        _clickTimer.Tick -= SingleClickTick;
-        _clickTimer.Tick += SingleClickTick;
-        _clickTimer.Start();
+        if (_doubleClickDown) _ = vm.PlayFromAsync(ratio);
+        else vm.SetPlayheadPosition(ratio);
     }
 
-    private void SingleClickTick(object? sender, EventArgs e)
+    private void Waveform_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
-        _clickTimer?.Stop();
-        if (DataContext is AudioSidebarViewModel vm) vm.SetPlayheadPosition(_pendingClickRatio);
+        _doubleClickDown = false;
+        _isScrubbing = false;
     }
 
     private void Waveform_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
     {
         if (e.LeftButton != System.Windows.Input.MouseButtonState.Pressed) return;
+        if (_doubleClickDown) return;              // double-click hold is not a scrub — don't pause playback
         if (DataContext is not AudioSidebarViewModel vm || vm.IsVisualizerActive) return;
-        _clickTimer?.Stop();                       // a drag is a scrub, not a pending click
+
+        // Ignore micro-jitter so a stationary click isn't treated as a drag.
+        if (!_isScrubbing &&
+            Math.Abs(e.GetPosition(WaveformHost).X - _downPoint.X) < SystemParameters.MinimumHorizontalDragDistance)
+            return;
+        _isScrubbing = true;
         vm.SetPlayheadPosition(PointerRatio(e));   // scrub position only, no autoplay
     }
 

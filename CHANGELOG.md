@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.1.1-beta
+
+- **Waveform playback fix** — single-click now seeks instantly (no double-click-interval delay); double-click reliably plays from the exact clicked position and no longer pauses right after starting. Click vs. drag-scrub are cleanly separated.
+- **Distribution** — ships as framework-dependent win-x64 only (no portable SDK bundle). Requires the .NET Desktop Runtime 8.0+, preinstalled on most Win10/11; if missing, install from https://dotnet.microsoft.com/download/dotnet/8.0.
+
 ## v0.1.0-beta
 
 First beta after the WinForms → modern WPF desktop rework. Highlights:
