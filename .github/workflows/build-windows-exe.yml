@@ -1,0 +1,92 @@
+name: Build Annoted WPF Windows EXE
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows-exe:
+    name: Build Windows EXE
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install .NET 8 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore Annoted.sln
+
+      - name: Publish Annoted WPF (framework-dependent)
+        run: >
+          dotnet publish Annoted.Wpf/Annoted.Wpf.csproj
+          -c Release -r win-x64 --self-contained false
+          /p:PublishSingleFile=false
+          /p:PublishReadyToRun=true
+          /p:DebugType=None
+          /p:DebugSymbols=false
+
+      - name: Package zip
+        shell: pwsh
+        run: |
+          $publishDir = "Annoted.Wpf/bin/Release/net8.0-windows/win-x64/publish"
+          $stageDir = "artifacts/Annoted-v0.1.0-beta-win-x64"
+          New-Item -ItemType Directory -Force -Path $stageDir | Out-Null
+          Copy-Item "$publishDir/*" $stageDir -Recurse -Force
+          # Whisper native engine lives under runtimes/win-x64/native — verify it survived publish.
+          if (-not (Test-Path "$stageDir/runtimes/win-x64/native")) {
+            if (-not (Get-ChildItem "$stageDir" -Filter "whisper*.dll" -ErrorAction SilentlyContinue)) {
+              Write-Error "Whisper native libraries missing from publish output."
+              exit 1
+            }
+          }
+          @"
+          Annoted v0.1.0-beta (win-x64)
+
+          Requires .NET Desktop Runtime 8.0 or newer.
+          Download: https://dotnet.microsoft.com/download/dotnet/8.0
+
+          Run Annoted.exe from this folder. Keep the runtimes/ folder beside it
+          (it contains the Whisper speech engine).
+          "@ | Set-Content "$stageDir/README.txt"
+          Compress-Archive -Path "$stageDir/*" -DestinationPath "artifacts/Annoted-v0.1.0-beta-win-x64.zip" -Force
+
+      - name: Upload Annoted zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: Annoted-v0.1.0-beta-win-x64
+          path: artifacts/Annoted-v0.1.0-beta-win-x64.zip
+          if-no-files-found: error
+
+      - name: Create GitHub release
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $tag = "${{ github.ref_name }}"
+          $notes = @"
+          Annoted $tag — first beta of the WinForms to WPF rework.
+
+          Requires .NET Desktop Runtime 8.0 or newer:
+          https://dotnet.microsoft.com/download/dotnet/8.0
+
+          Download Annoted-v0.1.0-beta-win-x64.zip, extract, and run Annoted.exe.
+          Keep the runtimes/ folder beside the exe (Whisper speech engine).
+
+          See CHANGELOG.md for full notes.
+          "@
+          gh release create $tag "artifacts/Annoted-v0.1.0-beta-win-x64.zip" `
+            --title "Annoted $tag" --notes "$notes" --prerelease

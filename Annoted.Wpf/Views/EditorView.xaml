@@ -1,0 +1,9 @@
+<UserControl x:Class="Annoted.Wpf.Views.EditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <RichTextBox x:Name="Editor"
+                 Style="{StaticResource EditorStyle}"
+                 TextChanged="Editor_TextChanged"
+                 KeyDown="Editor_KeyDown"
+                 FontSize="{Binding ZoomFactor, Converter={StaticResource ZoomToFontSizeConverter}}"/>
+</UserControl>

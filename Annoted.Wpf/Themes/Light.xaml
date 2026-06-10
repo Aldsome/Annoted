@@ -1,0 +1,37 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Color x:Key="BackgroundColor">#FFF3F3F3</Color>
+    <Color x:Key="SurfaceColor">#FFF3F3F3</Color>
+    <Color x:Key="SidebarColor">#FFF3F3F3</Color>
+    <Color x:Key="EditorBackColor">#FFFFFFFF</Color>
+    <Color x:Key="ForeColor">#FF1E1E1E</Color>
+    <Color x:Key="MutedForeColor">#FF666666</Color>
+    <Color x:Key="AccentColor">#FF007ACC</Color>
+    <Color x:Key="AccentHoverColor">#FF005FA8</Color>
+    <Color x:Key="BorderColor">#FFDEDEDE</Color>
+    <Color x:Key="TabActiveColor">#FFFFFFFF</Color>
+    <Color x:Key="TabInactiveColor">#FFE8E8E8</Color>
+    <Color x:Key="ButtonHoverColor">#FFE0E0E0</Color>
+    <Color x:Key="ButtonPressedColor">#FFCCCCCC</Color>
+    <Color x:Key="StatusBarBackColor">#FF007ACC</Color>
+    <Color x:Key="RecordRedColor">#FFC0392B</Color>
+    <Color x:Key="SelectionColor">#FFADD6FF</Color>
+
+    <SolidColorBrush x:Key="BackgroundBrush"    Color="{StaticResource BackgroundColor}" />
+    <SolidColorBrush x:Key="SurfaceBrush"       Color="{StaticResource SurfaceColor}" />
+    <SolidColorBrush x:Key="SidebarBrush"       Color="{StaticResource SidebarColor}" />
+    <SolidColorBrush x:Key="EditorBackBrush"    Color="{StaticResource EditorBackColor}" />
+    <SolidColorBrush x:Key="ForeBrush"          Color="{StaticResource ForeColor}" />
+    <SolidColorBrush x:Key="MutedForeBrush"     Color="{StaticResource MutedForeColor}" />
+    <SolidColorBrush x:Key="AccentBrush"        Color="{StaticResource AccentColor}" />
+    <SolidColorBrush x:Key="BorderBrush"        Color="{StaticResource BorderColor}" />
+    <SolidColorBrush x:Key="ButtonHoverBrush"   Color="{StaticResource ButtonHoverColor}" />
+    <SolidColorBrush x:Key="ButtonPressedBrush" Color="{StaticResource ButtonPressedColor}" />
+    <SolidColorBrush x:Key="StatusBarBackBrush" Color="{StaticResource StatusBarBackColor}" />
+    <SolidColorBrush x:Key="RecordRedBrush"     Color="{StaticResource RecordRedColor}" />
+    <SolidColorBrush x:Key="SelectionBrush"     Color="{StaticResource SelectionColor}" />
+    <SolidColorBrush x:Key="TabActiveBrush"     Color="{StaticResource TabActiveColor}" />
+    <SolidColorBrush x:Key="TabInactiveBrush"   Color="{StaticResource TabInactiveColor}" />
+
+</ResourceDictionary>

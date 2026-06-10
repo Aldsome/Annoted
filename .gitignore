@@ -1,0 +1,22 @@
+# Build output
+bin/
+obj/
+*.user
+*.suo
+.vs/
+
+# Local/runtime
+*.log
+annoted-crash.log
+AnnotedData/
+.portable
+
+# Large/downloaded binaries (Whisper models, SDKs) — never commit.
+# NOTE: do not use a bare "models/" — it also matches the source "Annoted.Core/Models/".
+ggml-*.bin
+*.onnx
+dotnet-sdk*/
+*.nupkg
+
+# Internal planning (never commit)
+migration.md
